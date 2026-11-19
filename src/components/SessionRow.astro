@@ -39,7 +39,7 @@ const materials = [
   </span>
   <span class="body">
     <span class="text">
-      <span class="kind">{kind}</span>
+      <span class="kind">{e.data.example && <span class="tag">Example</span>}{kind}</span>
       <span class="title">{e.data.title}</span>
       {
         showSpeaker && e.speakers.length > 0 && (

@@ -1,6 +1,7 @@
 import { getCollection, getEntries, type CollectionEntry } from 'astro:content';
 import { eventInterval } from './time';
 import { TOPICS, EVENT_TYPES, type TopicId } from '../data/topics';
+import site from '../data/site.json';
 
 export type EventEntry = CollectionEntry<'events'>;
 export type PersonEntry = CollectionEntry<'people'>;
@@ -23,7 +24,10 @@ export interface OloEvent {
 const showDrafts = import.meta.env.DEV;
 
 export async function getEvents(): Promise<OloEvent[]> {
-  const entries = await getCollection('events', (e) => showDrafts || !e.data.draft);
+  const entries = await getCollection(
+    'events',
+    (e) => (showDrafts || !e.data.draft) && (site.demo || !e.data.example),
+  );
   const now = Date.now();
   const events = await Promise.all(
     entries.map(async (entry) => {

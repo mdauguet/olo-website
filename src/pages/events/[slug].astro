@@ -62,7 +62,7 @@ const others = all.filter((o) => !o.isPast && o.id !== e.id).slice(0, 2);
 
     <section class="title-block">
       <div class="text">
-        <span class="label">{kind}</span>
+        <span class="label">{d.example && <span class="tag">Example</span>}{kind}</span>
         <h1 class="h1">{d.title}</h1>
         {
           e.speakers.length > 0 && (
@@ -75,6 +75,11 @@ const others = all.filter((o) => !o.isPast && o.id !== e.id).slice(0, 2);
           )
         }
         {d.status !== 'scheduled' && <p class="status">This session has been {d.status}.</p>}
+        {
+          d.example && (
+            <p class="status">This is an example to show how a session page works. It is not a real session.</p>
+          )
+        }
       </div>
       <Figure topic={e.mainTopic} />
     </section>
@@ -124,7 +129,7 @@ const others = all.filter((o) => !o.isPast && o.id !== e.id).slice(0, 2);
               </a>
             )
           }
-          {!past && <AddToCalendar event={e} block />}
+          {!past && !d.example && <AddToCalendar event={e} block />}
           {
             past && d.recording_url && (
               <a class="btn btn-primary block" href={d.recording_url} rel="noopener">

@@ -42,6 +42,8 @@ const events = defineCollection({
     code_url: optionalUrl,
     links: z.array(z.object({ label: z.string(), url: z.url() })).default([]),
     draft: z.boolean().default(false),
+    /** Sample content for the proposal site: labelled "Example", kept out of calendar feeds, hidden when demo is off. */
+    example: z.boolean().default(false),
   }),
 });
 

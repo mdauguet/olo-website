@@ -4,7 +4,7 @@ import { buildCalendar } from '../../lib/ics';
 import { toIcsEvent } from '../../lib/feed';
 
 export async function getStaticPaths() {
-  const events = await getEvents();
+  const events = (await getEvents()).filter((e) => !e.data.example);
   return events.map((event) => ({ params: { slug: event.id }, props: { event } }));
 }
 

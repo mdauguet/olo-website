@@ -34,7 +34,7 @@ const kind = [e.typeLabel, e.topicLabel].filter(Boolean).join(' · ');
 
     <div class="content">
       <a class="what" href={href(e.url)}>
-        <span class="kind">{kind}</span>
+        <span class="kind">{e.data.example && <span class="tag">Example</span>}{kind}</span>
         <span class="title">{e.data.title}</span>
         {
           e.speakers.length > 0 && (
@@ -58,7 +58,7 @@ const kind = [e.typeLabel, e.topicLabel].filter(Boolean).join(' · ');
             </a>
           )
         }
-        <AddToCalendar event={e} />
+        {!e.data.example && <AddToCalendar event={e} />}
         <a class="btn btn-outline details" href={href(e.url)}>Session details <span aria-hidden="true">→</span></a>
       </div>
     </div>

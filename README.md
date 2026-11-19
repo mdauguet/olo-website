@@ -4,7 +4,7 @@ The website of [Open Lab Online](https://nenckiopenlab.org/): free, live online 
 
 It is a static site built with [Astro](https://astro.build). Sessions and people are plain Markdown files, so the team can add a session without touching any code.
 
-> **Demo.** This is a preview. A notice at the top of every page says so, and some links and texts are placeholders (see [What is still missing](#what-is-still-missing)).
+> **Proposal.** This is a proposal for a new Open Lab Online website, not the official site. A notice at the top of every page says so, and some links and texts are placeholders (see [What is still missing](#what-is-still-missing)).
 
 ## Add a session
 
@@ -29,6 +29,7 @@ registration_url: https://forms.gle/…
 # recording_url: https://…
 # slides_url: https://…
 # code_url: https://…
+# example: true          # sample content: labelled "Example", never in calendar feeds, hidden when demo is off
 ---
 
 Optional longer description in Markdown. Headings and numbered lists are styled.
@@ -63,7 +64,7 @@ Without a photo, the profile shows initials on a coloured tile.
 
 ## Site-wide links
 
-`src/data/site.json` holds the Discord, newsletter, proposal-form and contact links. Empty values show as `#` in the demo. Set `"demo": false` to remove the preview notice and allow search engines to index the site.
+`src/data/site.json` holds the Discord, newsletter, proposal-form and contact links. Empty values show as `#` for now. Set `"demo": false` to remove the proposal notice, hide example sessions and allow search engines to index the site.
 
 ## Run it locally
 
