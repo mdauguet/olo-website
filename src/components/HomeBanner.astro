@@ -100,4 +100,26 @@ const SIGNAL_STRIP = 'M20 62 H60 V34 H90 V62 H276 V26 H300 V62 H360';
       padding-top: 4px;
     }
   }
+
+  /* Phones: the banner runs edge to edge and the copy tightens. */
+  @media (max-width: 640px) {
+    .banner-wrap {
+      padding: 0;
+    }
+    .banner {
+      border-radius: 0;
+    }
+    .text {
+      gap: 8px;
+      padding: 0 var(--gutter) 60px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      line-height: 1.22;
+    }
+    p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+  }
 </style>

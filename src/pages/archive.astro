@@ -161,4 +161,32 @@ const showFilter = topicIds.length > 1;
     line-height: 1.7;
     color: var(--body);
   }
+
+  /* Phones: topic chips become one row you can swipe. */
+  @media (max-width: 640px) {
+    .filter {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      margin-inline: calc(-1 * var(--gutter));
+      padding: 0 var(--gutter) 20px;
+      scrollbar-width: none;
+    }
+    .filter::-webkit-scrollbar {
+      display: none;
+    }
+    .chip-btn {
+      flex: 0 0 auto;
+    }
+    .year {
+      padding-bottom: 32px;
+    }
+    .empty {
+      padding: 20px;
+      gap: 16px;
+    }
+    .empty svg {
+      flex-basis: 100px;
+      width: 100px;
+    }
+  }
 </style>

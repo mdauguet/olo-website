@@ -114,6 +114,28 @@ function calendarMenus() {
   });
 }
 
+function menu() {
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const btn = header?.querySelector<HTMLButtonElement>('[data-menu-btn]');
+  if (!header || !btn) return;
+  const set = (open: boolean) => {
+    header.toggleAttribute('data-open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Menu');
+  };
+  btn.addEventListener('click', () => set(!header.hasAttribute('data-open')));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && header.hasAttribute('data-open')) {
+      set(false);
+      btn.focus();
+    }
+  });
+  window.matchMedia('(min-width: 721px)').addEventListener('change', (m) => {
+    if (m.matches) set(false);
+  });
+}
+
+menu();
 localTimes();
 zoneToggles();
 archiveFilter();

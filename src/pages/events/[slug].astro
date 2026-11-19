@@ -264,6 +264,9 @@ const others = all.filter((o) => !o.isPast && o.id !== e.id).slice(0, 2);
     font-size: 16px;
     line-height: 1.5;
   }
+  .fact-detail [data-t='countdown'] {
+    white-space: nowrap;
+  }
   .toggle-link {
     align-self: flex-start;
   }
@@ -380,5 +383,73 @@ const others = all.filter((o) => !o.isPast && o.id !== e.id).slice(0, 2);
     font-size: 15px;
     font-weight: 500;
     padding: 8px 0;
+  }
+
+  /* Phones: "At a glance" becomes compact label / value rows. */
+  @media (max-width: 640px) {
+    .facts {
+      flex-direction: column;
+      gap: 0;
+      padding: 4px 16px 16px;
+    }
+    .fact,
+    .fact.narrow,
+    .fact.actions {
+      flex: none;
+    }
+    .fact {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      column-gap: 12px;
+      row-gap: 2px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .fact-label {
+      grid-row: 1 / span 3;
+      padding-top: 3px;
+      font-size: 14px;
+    }
+    .fact-value,
+    .fact-detail,
+    .fact .toggle-link {
+      grid-column: 2;
+    }
+    .fact-value {
+      font-size: 18px;
+    }
+    .fact-detail {
+      font-size: 14.5px;
+    }
+    .fact .toggle-link {
+      justify-self: start;
+      min-height: 36px;
+      font-size: 14px;
+    }
+    .fact.actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px 0 0;
+      border-bottom: 0;
+    }
+    .body {
+      padding: 32px 0 40px;
+    }
+    .lede-serif {
+      font-size: 1.1rem;
+    }
+    .tutor-name {
+      font-size: 17px;
+    }
+    .tutor-bio {
+      font-size: 15px;
+    }
+    .also {
+      padding-bottom: 36px;
+    }
+    .also-head {
+      padding-top: 24px;
+    }
   }
 </style>

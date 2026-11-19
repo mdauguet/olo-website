@@ -106,4 +106,31 @@ for (const e of upcoming) {
     flex-wrap: wrap;
     gap: 10px;
   }
+
+  @media (max-width: 640px) {
+    .month {
+      padding-bottom: 28px;
+    }
+    .loop {
+      padding: 20px 16px;
+      margin-bottom: 28px;
+      gap: 14px;
+    }
+    .loop h2 {
+      font-size: 18px;
+    }
+    .loop-actions {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .loop-actions .btn {
+      padding-inline: 10px;
+      font-size: 14px;
+    }
+    .loop-actions .btn:first-child {
+      grid-column: 1 / -1;
+    }
+  }
 </style>

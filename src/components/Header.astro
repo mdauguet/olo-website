@@ -15,25 +15,30 @@ const nav = [
 ] as const;
 ---
 
-<header class="site-header container">
-  <a class="brand" href={href('/')}>
-    <Logo />
-    <span>Open Lab Online</span>
-  </a>
-  <nav aria-label="Main">
-    {
-      nav.map((item) => (
-        <a href={href(item.path)} aria-current={current === item.id ? 'page' : undefined}>
-          {item.label}
-        </a>
-      ))
-    }
-    <a class="discord" href={linkOr(site.discord_url)} rel="noopener">Discord ↗</a>
-  </nav>
+<header class="site-header" data-header>
+  <div class="bar container">
+    <a class="brand" href={href('/')}>
+      <Logo />
+      <span>Open Lab Online</span>
+    </a>
+    <button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" data-menu-btn>
+      <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
+    <nav id="site-nav" aria-label="Main">
+      {
+        nav.map((item) => (
+          <a href={href(item.path)} aria-current={current === item.id ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
+      <a class="discord" href={linkOr(site.discord_url)} rel="noopener">Discord ↗</a>
+    </nav>
+  </div>
 </header>
 
 <style>
-  .site-header {
+  .bar {
     display: flex;
     flex-wrap: wrap;
     gap: 4px 40px;
@@ -76,5 +81,114 @@ const nav = [
   nav .discord {
     color: var(--teal-ink);
     font-weight: 700;
+  }
+  .menu-btn {
+    display: none;
+  }
+
+  @media (max-width: 720px) {
+    .bar {
+      gap: 0 16px;
+      padding-block: 10px;
+    }
+    .brand {
+      gap: 10px;
+    }
+    .brand span {
+      font-size: 17px;
+    }
+
+    /* Without JavaScript the links stay visible as a row you can swipe. */
+    nav {
+      order: 3;
+      width: calc(100% + 2 * var(--gutter));
+      margin-inline: calc(-1 * var(--gutter));
+      padding-inline: var(--gutter);
+      flex-wrap: nowrap;
+      gap: 0 22px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+    nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* With JavaScript they move behind a menu button. */
+    :global(.js) .menu-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1px solid var(--rule-strong);
+      border-radius: var(--r-tile);
+      background: var(--white);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .bars {
+      position: relative;
+      width: 18px;
+      height: 12px;
+    }
+    .bars span {
+      position: absolute;
+      left: 0;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      transition: transform 0.2s ease, opacity 0.2s ease, top 0.2s ease;
+    }
+    .bars span:nth-child(1) {
+      top: 0;
+    }
+    .bars span:nth-child(2) {
+      top: 5px;
+    }
+    .bars span:nth-child(3) {
+      top: 10px;
+    }
+    .site-header[data-open] .bars span:nth-child(1) {
+      top: 5px;
+      transform: rotate(45deg);
+    }
+    .site-header[data-open] .bars span:nth-child(2) {
+      opacity: 0;
+    }
+    .site-header[data-open] .bars span:nth-child(3) {
+      top: 5px;
+      transform: rotate(-45deg);
+    }
+
+    :global(.js) nav {
+      display: none;
+    }
+    :global(.js) .site-header[data-open] nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 10px;
+      padding-bottom: 10px;
+      border-top: 1px solid var(--rule);
+      overflow: visible;
+      white-space: normal;
+    }
+    :global(.js) .site-header[data-open] nav a {
+      display: flex;
+      align-items: center;
+      min-height: 52px;
+      padding: 0;
+      border-bottom: 1px solid var(--rule);
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 700;
+    }
+    :global(.js) .site-header[data-open] nav a.discord {
+      border-bottom: 0;
+      font-family: var(--sans);
+      font-size: 16px;
+    }
   }
 </style>

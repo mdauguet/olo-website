@@ -242,4 +242,32 @@ const back = sessions.length > 0 ? { path: '/people/', label: 'All tutors' } : {
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
     gap: 12px;
   }
+
+  /* Phones: the portrait sits beside the name instead of below it. */
+  @media (max-width: 640px) {
+    .profile-head {
+      flex-wrap: nowrap;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 8px 0 24px;
+    }
+    .profile-head .text {
+      flex: 1 1 auto;
+      gap: 8px;
+      padding: 0;
+    }
+    .profile-head h1 {
+      font-size: 1.75rem;
+      line-height: 1.12;
+    }
+    .portrait {
+      flex: 0 0 88px;
+    }
+    .body {
+      padding: 28px 0 36px;
+    }
+    .team {
+      padding: 24px 0 32px;
+    }
+  }
 </style>

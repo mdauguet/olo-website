@@ -22,6 +22,9 @@ const pageTitle = title ? `${title} · ${site.title}` : `${site.title} · ${site
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <meta property="og:title" content={pageTitle} />
@@ -36,7 +39,7 @@ const pageTitle = title ? `${title} · ${site.title}` : `${site.title} · ${site
     {
       site.demo && (
         <p class="demo-bar">
-          <strong>Proposal</strong> for a new Open Lab Online website. Some links and texts are still placeholders.
+          <strong>Proposal</strong> for a new Open Lab Online website<span class="more">. Some links and texts are still placeholders</span>.
         </p>
       )
     }
@@ -76,5 +79,14 @@ const pageTitle = title ? `${title} · ${site.title}` : `${site.title} · ${site
   }
   .demo-bar strong {
     color: var(--white);
+  }
+  @media (max-width: 640px) {
+    .demo-bar {
+      font-size: 12px;
+      padding-block: 6px;
+    }
+    .demo-bar .more {
+      display: none;
+    }
   }
 </style>

@@ -18,18 +18,16 @@ const kind = [e.typeLabel, e.topicLabel].filter(Boolean).join(' · ');
 <article class="next card" data-when data-start={e.start.toISOString()} data-end={e.end.toISOString()}>
   <div class="top">
     <div class="date-zone">
-      <div class="date-row">
-        <CalendarLeaf w={w} size="lg" />
-        <span class="sr-only"><span data-t="date">{w.date}</span>,</span>
-        <span class="time-stack">
-          <span class="countdown" data-t="countdown">{w.countdown}</span>
-          <span class="range" data-t="range">{w.range}</span>
-          <span class="zonephrase" data-t="zonephrase">{w.zonephrase}</span>
-        </span>
-      </div>
-      <button type="button" class="toggle-link" data-zones-toggle aria-controls={zonesId} aria-expanded="true" hidden>
-        Hide other time zones
-      </button>
+      <CalendarLeaf w={w} size="lg" />
+      <span class="sr-only"><span data-t="date">{w.date}</span>,</span>
+      <span class="time-stack">
+        <span class="countdown" data-t="countdown">{w.countdown}</span>
+        <span class="range" data-t="range">{w.range}</span>
+        <span class="zonephrase" data-t="zonephrase">{w.zonephrase}</span>
+        <button type="button" class="toggle-link" data-zones-toggle aria-controls={zonesId} aria-expanded="true" hidden>
+          Hide other time zones
+        </button>
+      </span>
     </div>
 
     <div class="content">
@@ -59,7 +57,10 @@ const kind = [e.typeLabel, e.topicLabel].filter(Boolean).join(' · ');
           )
         }
         {!e.data.example && <AddToCalendar event={e} />}
-        <a class="btn btn-outline details" href={href(e.url)}>Session details <span aria-hidden="true">→</span></a>
+        <a class="btn btn-outline details" href={href(e.url)}>
+          <span class="lbl-long">Session details</span><span class="lbl-short">Details</span>
+          <span aria-hidden="true">→</span>
+        </a>
       </div>
     </div>
   </div>
@@ -92,32 +93,19 @@ const kind = [e.typeLabel, e.topicLabel].filter(Boolean).join(' · ');
   .date-zone {
     flex: 1 1 300px;
     background: var(--plum-pale);
-    padding: 28px 24px 16px;
+    padding: 28px 24px;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: flex-start;
+    gap: 20px;
     /* The card does not clip (the calendar menu must overflow), so the tint follows its corners. */
     border-radius: 19px 0 0 19px;
   }
   .next:has(.zones:not([hidden])) .date-zone {
     border-bottom-left-radius: 0;
   }
-  @container (max-width: 780px) {
-    .date-zone,
-    .next:has(.zones:not([hidden])) .date-zone {
-      border-radius: 19px 19px 0 0;
-    }
-    .details {
-      margin-left: 0;
-    }
-  }
-  .date-row {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
   .time-stack {
     min-width: 0;
+    padding-top: 8px;
     display: flex;
     flex-direction: column;
     gap: 3px;
@@ -140,6 +128,7 @@ const kind = [e.typeLabel, e.topicLabel].filter(Boolean).join(' · ');
   }
   .toggle-link {
     align-self: flex-start;
+    margin-top: 2px;
   }
   .content {
     flex: 999 1 480px;
@@ -186,7 +175,86 @@ const kind = [e.typeLabel, e.topicLabel].filter(Boolean).join(' · ');
   .details {
     margin-left: auto;
   }
+  .lbl-short {
+    display: none;
+  }
   .next :global(.zones) {
     border-radius: 0 0 19px 19px;
+  }
+
+  /* Stacked layout: the date zone becomes a band across the top. */
+  @container (max-width: 780px) {
+    .date-zone,
+    .next:has(.zones:not([hidden])) .date-zone {
+      border-radius: 19px 19px 0 0;
+    }
+    .date-zone {
+      --leaf-w: 78px;
+      --leaf-num: 32px;
+      --leaf-num-pad: 8px 0 2px;
+      --leaf-band: 11px;
+      --leaf-band-pad: 5px 0 4px 0.18em;
+      --leaf-wday: 12px;
+      --leaf-wday-pad: 8px;
+      gap: 16px;
+      padding: 18px 24px;
+    }
+    .details {
+      margin-left: 0;
+    }
+  }
+
+  /* Phones: smaller leaf, tighter text, buttons on a two-column grid. */
+  @container (max-width: 560px) {
+    .date-zone {
+      padding: 16px;
+    }
+    .time-stack {
+      padding-top: 4px;
+    }
+    .range {
+      font-size: 18px;
+    }
+    .toggle-link {
+      min-height: 36px;
+    }
+    .content {
+      gap: 16px;
+      padding: 18px 16px 16px;
+    }
+    .what {
+      gap: 8px;
+    }
+    .kind {
+      font-size: 13px;
+    }
+    .title {
+      font-size: 1.3rem;
+      line-height: 1.25;
+    }
+    .who {
+      font-size: 14.5px;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .actions > .btn-primary,
+    .actions > :only-child {
+      grid-column: 1 / -1;
+    }
+    .actions .btn,
+    .actions :global(summary) {
+      width: 100%;
+      padding-inline: 12px;
+      font-size: 14px;
+    }
+    .lbl-long {
+      display: none;
+    }
+    .lbl-short {
+      display: inline;
+    }
   }
 </style>

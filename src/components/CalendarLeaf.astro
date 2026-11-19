@@ -20,6 +20,7 @@ const { w, size = 'sm', past = false } = Astro.props;
 </span>
 
 <style>
+  /* The large leaf reads its sizes from --leaf-* variables so a parent can shrink it on phones. */
   .leaf {
     position: relative;
     flex: 0 0 auto;
@@ -73,7 +74,7 @@ const { w, size = 'sm', past = false } = Astro.props;
   }
 
   .lg {
-    width: 104px;
+    width: var(--leaf-w, 104px);
     padding-bottom: 8px;
   }
   .lg .sheet {
@@ -96,20 +97,20 @@ const { w, size = 'sm', past = false } = Astro.props;
     border-radius: 0 0 10px 10px;
   }
   .lg .band {
-    font-size: 12px;
+    font-size: var(--leaf-band, 12px);
     letter-spacing: 0.18em;
-    padding: 8px 0 7px 0.18em;
+    padding: var(--leaf-band-pad, 8px 0 7px 0.18em);
   }
   .lg .num {
-    font-size: 46px;
+    font-size: var(--leaf-num, 46px);
     letter-spacing: -0.02em;
-    padding: 12px 0 4px;
+    padding: var(--leaf-num-pad, 12px 0 4px);
   }
   .lg .wday {
-    font-size: 13px;
+    font-size: var(--leaf-wday, 13px);
     font-weight: 700;
     color: var(--muted);
-    padding: 0 0 12px;
+    padding: 0 0 var(--leaf-wday-pad, 12px);
   }
 
   .past .band {

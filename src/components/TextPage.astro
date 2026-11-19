@@ -97,4 +97,20 @@ const { label, title, lede, updated, sections } = Astro.props;
   .toc a:hover {
     text-decoration: underline;
   }
+
+  /* Once it would drop below the text it is no use, so hide it. */
+  @media (max-width: 900px) {
+    .toc {
+      display: none;
+    }
+  }
+  @media (max-width: 640px) {
+    .layout {
+      padding-top: 20px;
+      padding-bottom: 40px;
+    }
+    .main {
+      gap: 28px;
+    }
+  }
 </style>

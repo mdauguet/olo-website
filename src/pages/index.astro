@@ -126,4 +126,25 @@ const also = rest.slice(0, 3);
     gap: 10px;
     margin-top: 8px;
   }
+
+  @media (max-width: 640px) {
+    .overlap {
+      margin-top: -44px;
+      padding-bottom: 32px;
+    }
+    .block {
+      gap: 12px;
+      padding-bottom: 28px;
+    }
+    .head h2 {
+      font-size: 20px;
+    }
+    .head a,
+    .more a {
+      font-size: 14px;
+    }
+    .more {
+      flex-direction: column;
+    }
+  }
 </style>

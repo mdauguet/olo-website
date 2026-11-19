@@ -59,4 +59,18 @@ const contact = site.contact_email ? `mailto:${site.contact_email}` : '#';
   .credit strong {
     color: var(--ink);
   }
+
+  @media (max-width: 640px) {
+    .links {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 16px;
+      padding-top: 8px;
+    }
+    .colophon {
+      flex-direction: column;
+      gap: 6px;
+      padding: 14px 0 28px;
+    }
+  }
 </style>
