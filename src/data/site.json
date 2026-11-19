@@ -1,0 +1,13 @@
+{
+  "title": "Open Lab Online",
+  "tagline": "Learn open-source tools for neuroscience, live and for free.",
+  "description": "Free, live online workshops and talks on open-source tools for neuroscience: behavioural setups, experimental control, synchronization and data analysis.",
+  "demo": true,
+  "discord_url": "",
+  "survey_url": "https://docs.google.com/forms/d/e/1FAIpQLSd1dJxECfbr6geQMt9BtSpSPslq-zlHnd6oW2OH1wg02ruTEQ/viewform",
+  "proposal_url": "",
+  "newsletter_url": "",
+  "contact_email": "",
+  "github_url": "",
+  "nencki_url": "https://nenckiopenlab.org/"
+}

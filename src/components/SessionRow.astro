@@ -1,0 +1,194 @@
+---
+import type { OloEvent } from '../lib/events';
+import { whenText } from '../lib/when';
+import { href } from '../lib/paths';
+import CalendarLeaf from './CalendarLeaf.astro';
+
+interface Props {
+  event: OloEvent;
+  past?: boolean;
+  showSpeaker?: boolean;
+  showSummary?: boolean;
+}
+const { event: e, past = e.isPast, showSpeaker = true, showSummary = false } = Astro.props;
+const w = whenText(e.start, e.end, e.data.timezone);
+const kind = [e.typeLabel, e.topicLabel].filter(Boolean).join(' · ');
+const materials = [
+  e.data.recording_url && 'Recording',
+  e.data.slides_url && 'Slides',
+  e.data.code_url && 'Code',
+].filter(Boolean);
+---
+
+<a
+  class:list={['row', { past }]}
+  href={href(e.url)}
+  data-when
+  data-start={e.start.toISOString()}
+  data-end={e.end.toISOString()}
+  data-topics={e.data.topics.join(' ')}>
+  <span class="when">
+    <CalendarLeaf w={w} past={past} />
+    <span class="sr-only"><span data-t="date">{w.date}</span>,</span>
+    <span class="when-text">
+      <span class="wd" data-t="weekday">{w.weekday}</span>
+      <span class="sub">
+        <strong data-t="time">{w.time}</strong> <span data-t="yourtime">{w.zone}</span>
+      </span>
+    </span>
+  </span>
+  <span class="body">
+    <span class="text">
+      <span class="kind">{kind}</span>
+      <span class="title">{e.data.title}</span>
+      {
+        showSpeaker && e.speakers.length > 0 && (
+          <span class="who">
+            {e.speakers.map((p, i) => (
+              <>
+                {i > 0 && ' · '}
+                <strong>{p.data.name}</strong>
+                {p.data.affiliation && `, ${p.data.affiliation}`}
+              </>
+            ))}
+          </span>
+        )
+      }
+      {showSummary && <span class="summary">{e.data.summary}</span>}
+      {
+        past && (
+          <span class="avail">
+            {materials.length ? (
+              <>
+                Available: <strong>{materials.join(' · ')}</strong>
+              </>
+            ) : (
+              'No recording or materials shared yet'
+            )}
+          </span>
+        )
+      }
+    </span>
+    <span class="btn-row">{past ? 'View' : 'Details'} <span aria-hidden="true">→</span></span>
+  </span>
+</a>
+
+<style>
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-rest);
+    color: var(--ink);
+    text-decoration: none;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .row:hover {
+    color: var(--ink);
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-2px);
+  }
+  .row:hover .title {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+  .row:hover .btn-row {
+    background: var(--ink);
+    color: var(--white);
+    gap: 14px;
+  }
+  .row[hidden] {
+    display: none;
+  }
+  .when {
+    flex: 1 1 240px;
+    background: var(--sky-pale);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .past .when {
+    background: var(--grey-pale);
+  }
+  .when-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .wd {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .sub {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .sub strong {
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .body {
+    flex: 999 1 440px;
+    min-width: 0;
+    padding: 18px clamp(20px, 3vw, 32px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 24px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .text {
+    flex: 1 1 340px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .kind {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .title {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.32;
+  }
+  .who,
+  .avail {
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .who strong,
+  .avail strong {
+    color: var(--ink);
+  }
+  .summary {
+    margin-top: 2px;
+    font-family: var(--serif);
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: var(--body);
+  }
+  .btn-row {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1.5px solid var(--ink);
+    border-radius: var(--r-tile);
+    background: var(--white);
+    font-size: 15px;
+    font-weight: 700;
+    transition: background 0.2s ease, color 0.2s ease, gap 0.2s ease;
+  }
+</style>

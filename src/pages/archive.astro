@@ -1,0 +1,164 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SessionRow from '../components/SessionRow.astro';
+import { getUpcomingAndPast } from '../lib/events';
+import { whenText } from '../lib/when';
+import { href } from '../lib/paths';
+import { TOPICS, type TopicId } from '../data/topics';
+
+const { past } = await getUpcomingAndPast();
+const years = new Map<string, typeof past>();
+for (const e of past) {
+  const y = whenText(e.start, e.end, e.data.timezone).year;
+  years.set(y, [...(years.get(y) ?? []), e]);
+}
+// Only offer topics that have past sessions, so no chip leads to an empty list.
+const topicIds = Object.keys(TOPICS).filter((id) => past.some((e) => e.data.topics.includes(id as TopicId))) as TopicId[];
+const showFilter = topicIds.length > 1;
+---
+
+<BaseLayout title="Past sessions" current="archive">
+  <div class="container">
+    <section class="page-head">
+      <h1 class="h1">Past sessions</h1>
+      <p class="lede">Recordings, slides and code from past sessions, wherever the tutors shared them.</p>
+    </section>
+
+    {
+      past.length > 0 ? (
+        <>
+          {showFilter && (
+            <div class="filter" role="group" aria-label="Filter by topic" data-filter hidden>
+              <button type="button" class="chip-btn" data-topic="all" aria-pressed="true">
+                All topics
+              </button>
+              {topicIds.map((id) => (
+                <button type="button" class="chip-btn" data-topic={id} aria-pressed="false">
+                  {TOPICS[id]}
+                </button>
+              ))}
+            </div>
+          )}
+          {[...years].map(([year, events]) => (
+            <section class="year" aria-labelledby={`year-${year}`}>
+              <div class="section-head">
+                <h2 id={`year-${year}`} class="h2">
+                  {year}
+                </h2>
+                <span class="note" data-count>
+                  {events.length === 1 ? '1 session' : `${events.length} sessions`}
+                </span>
+              </div>
+              {events.map((e) => (
+                <SessionRow event={e} past />
+              ))}
+              <p class="no-match" data-no-match hidden>
+                Nothing on this topic yet. <a href={href('/events/')}>See upcoming sessions →</a>
+              </p>
+            </section>
+          ))}
+        </>
+      ) : (
+        <section class="empty">
+          <svg viewBox="0 0 96 64" aria-hidden="true">
+            <rect x="30" y="6" width="18" height="56" fill="#A0CFE6" />
+            <path d="M4 44 H30 V22 H48 V44 H92" fill="none" stroke="#1C1E1F" stroke-width="1.6" />
+            <line x1="66" y1="4" x2="66" y2="62" stroke="#9A4061" stroke-width="1.2" stroke-dasharray="1.5 2.5" />
+          </svg>
+          <div class="empty-text">
+            <h2 class="h2">The first recordings are on their way</h2>
+            <p>Recordings, slides and code will appear here after the first sessions.</p>
+            <a class="btn btn-primary" href={href('/events/')}>
+              See upcoming sessions <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </section>
+      )
+    }
+
+    <section class="cta-line">
+      <p>Taught a session with us? Send us your slides and code.</p>
+      <a class="btn btn-outline" href={href('/get-involved/')}>Get in touch <span aria-hidden="true">→</span></a>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 36px;
+  }
+  .filter[hidden] {
+    display: none;
+  }
+  .chip-btn {
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: var(--r-tile);
+    border: 1px solid var(--rule-strong);
+    background: var(--white);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .chip-btn[aria-pressed='true'] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--white);
+  }
+  .year {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 56px;
+  }
+  .note {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .no-match {
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--body);
+    padding: 12px 0;
+  }
+  .no-match a {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--teal-ink);
+    margin-left: 12px;
+  }
+  .empty {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px 48px;
+    align-items: center;
+    border: 1px dashed #c9d1d4;
+    border-radius: var(--r-card);
+    padding: clamp(28px, 4vw, 48px);
+    margin-bottom: 56px;
+  }
+  .empty svg {
+    flex: 0 0 140px;
+    width: 140px;
+    height: auto;
+  }
+  .empty-text {
+    flex: 1 1 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .empty-text p {
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--body);
+  }
+</style>

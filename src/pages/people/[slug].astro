@@ -1,0 +1,245 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Portrait from '../../components/Portrait.astro';
+import PersonCard from '../../components/PersonCard.astro';
+import SessionRow from '../../components/SessionRow.astro';
+import { getEvents } from '../../lib/events';
+import { getPeople, sessionsFor, topicsOf, toolsOf, roleLine, type Person } from '../../lib/people';
+import { href } from '../../lib/paths';
+
+export async function getStaticPaths() {
+  const people = await getPeople();
+  return people.map((person) => ({ params: { slug: person.id }, props: { person, people } }));
+}
+
+interface Props {
+  person: Person;
+  people: Person[];
+}
+const { person, people } = Astro.props;
+const p = person.data;
+const events = await getEvents();
+const sessions = sessionsFor(person.id, events);
+const upcoming = sessions.filter((e) => !e.isPast);
+const past = sessions.filter((e) => e.isPast).reverse();
+const talksOnly = sessions.length > 0 && sessions.every((e) => e.data.type === 'seminar' || e.data.type === 'talk');
+const label = [sessions.length > 0 && (talksOnly ? 'Speaker' : 'Tutor'), p.team && 'Open Lab Online team']
+  .filter(Boolean)
+  .join(' · ');
+const { Content } = await render(person);
+const hasBio = Boolean(person.body?.trim());
+const topics = topicsOf(sessions);
+const tools = toolsOf(sessions);
+const links = [
+  p.website && { label: 'Website', url: p.website },
+  p.github && { label: 'GitHub', url: p.github },
+  p.orcid && { label: 'ORCID', url: p.orcid },
+  p.bluesky && { label: 'Bluesky', url: p.bluesky },
+  p.linkedin && { label: 'LinkedIn', url: p.linkedin },
+].filter(Boolean) as { label: string; url: string }[];
+const hasAside = topics.length + tools.length + p.interests.length + links.length > 0;
+const teammates = p.team ? people.filter((o) => o.data.team && o.id !== person.id).sort((a, b) => a.data.order - b.data.order) : [];
+const back = sessions.length > 0 ? { path: '/people/', label: 'All tutors' } : { path: '/about/#team', label: 'About and team' };
+---
+
+<BaseLayout title={p.name} description={`${p.name}${roleLine(person) ? `, ${roleLine(person)}` : ''}. ${label}.`}>
+  <div class="container">
+    <a class="back-link" href={href(back.path)}><span aria-hidden="true">←</span> {back.label}</a>
+
+    <section class="profile-head">
+      <div class="text">
+        <span class="label">{label}</span>
+        <h1>{p.name}</h1>
+        {roleLine(person) && <span class="byline">{roleLine(person)}</span>}
+      </div>
+      <div class="portrait">
+        <Portrait person={person} size="lg" />
+      </div>
+    </section>
+
+    <div class="two-col body">
+      <div class="main-col">
+        {
+          hasBio && (
+            <section class="stack">
+              <h2 class="h2">About</h2>
+              <div class="reading">
+                <Content />
+              </div>
+            </section>
+          )
+        }
+        {
+          p.team && p.team_role && (
+            <section class="stack">
+              <h2 class="h2">At Open Lab Online</h2>
+              <p class="reading">{p.team_role}</p>
+            </section>
+          )
+        }
+        {
+          sessions.length > 0 && (
+            <section class="stack sessions">
+              <h2 class="h2">Sessions</h2>
+              {upcoming.length > 0 && <span class="label">Upcoming</span>}
+              {upcoming.map((e) => (
+                <SessionRow event={e} showSpeaker={false} />
+              ))}
+              {past.length > 0 && <span class="label">Past</span>}
+              {past.map((e) => (
+                <SessionRow event={e} past showSpeaker={false} />
+              ))}
+            </section>
+          )
+        }
+      </div>
+
+      {
+        hasAside && (
+          <aside class="side-col">
+            <div class="side-card">
+              {topics.length > 0 && (
+                <div class="group">
+                  <h2 class="group-title">{talksOnly ? 'Talks about' : 'Teaches'}</h2>
+                  <div class="chips">
+                    {topics.map((t) => (
+                      <a class="chip" href={href(`/archive/?topic=${t.id}`)}>
+                        {t.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {tools.length > 0 && (
+                <div class="group">
+                  <h2 class="group-title">Tools used</h2>
+                  <div class="chips">
+                    {tools.map((t) => (
+                      <span class="chip chip-outline">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {p.interests.length > 0 && (
+                <div class="group">
+                  <h2 class="group-title">Research</h2>
+                  <div class="chips">
+                    {p.interests.map((t) => (
+                      <span class="chip chip-outline">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {links.length > 0 && (
+                <div class="group links">
+                  <h2 class="group-title">Elsewhere</h2>
+                  {links.map((l) => (
+                    <a class="link-strong" href={l.url} rel="noopener">
+                      {l.label} ↗
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </aside>
+        )
+      }
+    </div>
+
+    {
+      teammates.length > 0 && (
+        <section class="team" aria-labelledby="also-team">
+          <h2 id="also-team">Also on the team</h2>
+          <div class="grid">
+            {teammates.map((t) => (
+              <PersonCard person={t} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      p.team ? (
+        <section class="cta-line">
+          <p>Want to help run Open Lab Online?</p>
+          <a class="btn btn-outline" href={href('/get-involved/')}>
+            Get involved <span aria-hidden="true">→</span>
+          </a>
+        </section>
+      ) : (
+        <section class="cta-line">
+          <p>Have an open-source tool or method to share with other labs?</p>
+          <a class="btn btn-outline" href={href('/get-involved/')}>
+            Propose a session <span aria-hidden="true">→</span>
+          </a>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .profile-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px 56px;
+    align-items: flex-end;
+    padding: 28px 0 48px;
+  }
+  .profile-head .text {
+    flex: 999 1 560px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-bottom: 8px;
+  }
+  .profile-head h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+  }
+  .byline {
+    max-width: 34em;
+  }
+  .portrait {
+    flex: 0 1 240px;
+    min-width: 0;
+  }
+  .body {
+    border-top: 1px solid var(--rule);
+    padding: 48px 0 56px;
+  }
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .sessions {
+    gap: 14px;
+  }
+  .links {
+    gap: 2px;
+  }
+  .team {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border-top: 1px solid var(--rule);
+    padding: 32px 0 48px;
+  }
+  .team h2 {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+    gap: 12px;
+  }
+</style>

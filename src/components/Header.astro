@@ -1,0 +1,80 @@
+---
+import Logo from './Logo.astro';
+import site from '../data/site.json';
+import { href, linkOr } from '../lib/paths';
+
+interface Props {
+  current?: 'events' | 'archive' | 'about' | 'get-involved';
+}
+const { current } = Astro.props;
+const nav = [
+  { id: 'events', label: 'Events', path: '/events/' },
+  { id: 'archive', label: 'Archive', path: '/archive/' },
+  { id: 'about', label: 'About', path: '/about/' },
+  { id: 'get-involved', label: 'Get involved', path: '/get-involved/' },
+] as const;
+---
+
+<header class="site-header container">
+  <a class="brand" href={href('/')}>
+    <Logo />
+    <span>Open Lab Online</span>
+  </a>
+  <nav aria-label="Main">
+    {
+      nav.map((item) => (
+        <a href={href(item.path)} aria-current={current === item.id ? 'page' : undefined}>
+          {item.label}
+        </a>
+      ))
+    }
+    <a class="discord" href={linkOr(site.discord_url)} rel="noopener">Discord ↗</a>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 40px;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 20px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .brand span {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 24px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  nav a {
+    padding: 12px 0;
+    text-decoration: none;
+  }
+  nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+  nav a:hover {
+    text-decoration: underline;
+  }
+  nav .discord {
+    color: var(--teal-ink);
+    font-weight: 700;
+  }
+</style>

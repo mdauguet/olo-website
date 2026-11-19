@@ -1,0 +1,80 @@
+---
+import '@fontsource-variable/merriweather';
+import '@fontsource-variable/merriweather/wght-italic.css';
+import '@fontsource-variable/merriweather-sans';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import site from '../data/site.json';
+import { href } from '../lib/paths';
+
+interface Props {
+  title?: string;
+  description?: string;
+  current?: 'events' | 'archive' | 'about' | 'get-involved';
+}
+const { title, description = site.description, current } = Astro.props;
+const pageTitle = title ? `${title} · ${site.title}` : `${site.title} · ${site.tagline}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href={href('/favicon.svg')} />
+    <link rel="alternate" type="text/calendar" title="Open Lab Online sessions" href={href('/calendar.ics')} />
+    {site.demo && <meta name="robots" content="noindex" />}
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    {
+      site.demo && (
+        <p class="demo-bar">
+          <strong>Preview</strong> of the new Open Lab Online website. Some links and texts are still placeholders.
+        </p>
+      )
+    }
+    <Header current={current} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import '../scripts/site.ts';
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    left: 16px;
+    top: -60px;
+    z-index: 10;
+    padding: 10px 14px;
+    background: var(--ink);
+    color: var(--white);
+    border-radius: var(--r-tile);
+    font-weight: 700;
+  }
+  .skip:focus {
+    top: 12px;
+  }
+  .demo-bar {
+    margin: 0;
+    padding: 8px var(--gutter);
+    background: var(--ink);
+    color: #e9ecec;
+    font-size: 13px;
+    text-align: center;
+  }
+  .demo-bar strong {
+    color: var(--white);
+  }
+</style>

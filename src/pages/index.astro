@@ -1,0 +1,129 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeBanner from '../components/HomeBanner.astro';
+import NextSessionCard from '../components/NextSessionCard.astro';
+import SessionRow from '../components/SessionRow.astro';
+import { getUpcomingAndPast } from '../lib/events';
+import { href } from '../lib/paths';
+
+const { upcoming } = await getUpcomingAndPast();
+const [next, ...rest] = upcoming;
+const also = rest.slice(0, 3);
+---
+
+<BaseLayout>
+  <HomeBanner />
+
+  <div class="overlap container">
+    <section class="block" aria-labelledby="next-heading">
+      <div class="head">
+        <h2 id="next-heading">Next session</h2>
+        <a href={href('/events/')}>All upcoming sessions →</a>
+      </div>
+      {
+        next ? (
+          <NextSessionCard event={next} />
+        ) : (
+          <div class="empty card">
+            <h3>No sessions are scheduled right now</h3>
+            <p>New sessions are announced here, on Discord and in the newsletter.</p>
+            <div class="empty-actions">
+              <a class="btn btn-outline" href={href('/archive/')}>
+                Past sessions <span aria-hidden="true">→</span>
+              </a>
+              <a class="btn btn-quiet" href={href('/get-involved/')}>
+                Propose a session
+              </a>
+            </div>
+          </div>
+        )
+      }
+    </section>
+
+    {
+      also.length > 0 && (
+        <section class="block also" aria-labelledby="also-heading">
+          <h3 id="also-heading">Also coming up</h3>
+          {also.map((e) => (
+            <SessionRow event={e} />
+          ))}
+        </section>
+      )
+    }
+
+    <div class="more">
+      <a href={href('/archive/')}>Past sessions and recordings →</a>
+      <a href={href('/calendar.ics')}>Subscribe to the calendar</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .overlap {
+    position: relative;
+    z-index: 1;
+    margin-top: calc(-1 * clamp(60px, 5.5vw, 76px));
+    padding-bottom: 56px;
+  }
+  .block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 40px;
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px 24px;
+  }
+  .head h2 {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .head a,
+  .more a {
+    font-size: 15px;
+    font-weight: 500;
+    padding: 8px 0;
+  }
+  .also {
+    gap: 14px;
+  }
+  .also h3 {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 32px;
+  }
+  .empty {
+    padding: clamp(24px, 3vw, 36px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .empty h3 {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .empty p {
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--body);
+  }
+  .empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+  }
+</style>

@@ -1,0 +1,192 @@
+---
+import type { OloEvent } from '../lib/events';
+import { whenText } from '../lib/when';
+import { href } from '../lib/paths';
+import CalendarLeaf from './CalendarLeaf.astro';
+import ZonesPanel from './ZonesPanel.astro';
+import AddToCalendar from './AddToCalendar.astro';
+
+interface Props {
+  event: OloEvent;
+}
+const { event: e } = Astro.props;
+const w = whenText(e.start, e.end, e.data.timezone);
+const zonesId = `zones-${e.id}`;
+const kind = [e.typeLabel, e.topicLabel].filter(Boolean).join(' · ');
+---
+
+<article class="next card" data-when data-start={e.start.toISOString()} data-end={e.end.toISOString()}>
+  <div class="top">
+    <div class="date-zone">
+      <div class="date-row">
+        <CalendarLeaf w={w} size="lg" />
+        <span class="sr-only"><span data-t="date">{w.date}</span>,</span>
+        <span class="time-stack">
+          <span class="countdown" data-t="countdown">{w.countdown}</span>
+          <span class="range" data-t="range">{w.range}</span>
+          <span class="zonephrase" data-t="zonephrase">{w.zonephrase}</span>
+        </span>
+      </div>
+      <button type="button" class="toggle-link" data-zones-toggle aria-controls={zonesId} aria-expanded="true" hidden>
+        Hide other time zones
+      </button>
+    </div>
+
+    <div class="content">
+      <a class="what" href={href(e.url)}>
+        <span class="kind">{kind}</span>
+        <span class="title">{e.data.title}</span>
+        {
+          e.speakers.length > 0 && (
+            <span class="who">
+              {e.speakers.map((p, i) => (
+                <>
+                  {i > 0 && ' · '}
+                  <strong>{p.data.name}</strong>
+                  {p.data.affiliation && `, ${p.data.affiliation}`}
+                </>
+              ))}
+            </span>
+          )
+        }
+      </a>
+      <div class="actions">
+        {
+          e.data.registration_url && (
+            <a class="btn btn-primary" href={e.data.registration_url} rel="noopener">
+              Register, free <span aria-hidden="true">→</span>
+            </a>
+          )
+        }
+        <AddToCalendar event={e} />
+        <a class="btn btn-outline details" href={href(e.url)}>Session details <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </div>
+  <ZonesPanel id={zonesId} start={e.start} />
+</article>
+
+<style>
+  .next {
+    container-type: inline-size;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .next:hover {
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-3px);
+  }
+  .next:hover .title {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+  .next:hover .details {
+    background: var(--ink);
+    color: var(--white);
+    gap: 16px;
+  }
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .date-zone {
+    flex: 1 1 300px;
+    background: var(--plum-pale);
+    padding: 28px 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* The card does not clip (the calendar menu must overflow), so the tint follows its corners. */
+    border-radius: 19px 0 0 19px;
+  }
+  .next:has(.zones:not([hidden])) .date-zone {
+    border-bottom-left-radius: 0;
+  }
+  @container (max-width: 780px) {
+    .date-zone,
+    .next:has(.zones:not([hidden])) .date-zone {
+      border-radius: 19px 19px 0 0;
+    }
+    .details {
+      margin-left: 0;
+    }
+  }
+  .date-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .time-stack {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .countdown {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--plum);
+  }
+  .range {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .zonephrase {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .toggle-link {
+    align-self: flex-start;
+  }
+  .content {
+    flex: 999 1 480px;
+    min-width: 0;
+    padding: clamp(22px, 3vw, 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    justify-content: space-between;
+  }
+  .what {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .kind {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .title {
+    max-width: 24em;
+    font-family: var(--serif);
+    font-size: clamp(1.45rem, 2.4vw, 1.95rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.22;
+  }
+  .who {
+    font-size: 16px;
+    color: var(--muted);
+  }
+  .who strong {
+    color: var(--ink);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    align-items: center;
+  }
+  .details {
+    margin-left: auto;
+  }
+  .next :global(.zones) {
+    border-radius: 0 0 19px 19px;
+  }
+</style>

@@ -1,0 +1,105 @@
+---
+import type { Person } from '../lib/people';
+import { roleLine } from '../lib/people';
+import { href } from '../lib/paths';
+import Portrait from './Portrait.astro';
+
+interface Props {
+  person: Person;
+  meta?: string;
+}
+const { person, meta } = Astro.props;
+const role = roleLine(person);
+---
+
+<a class:list={['person', { 'has-meta': !!meta }]} href={href(`/people/${person.id}/`)}>
+  <span class="head">
+    <Portrait person={person} size={meta ? 'md' : 'sm'} />
+    <span class="names">
+      <span class="name">{person.data.name}</span>
+      {role && <span class="role">{role}</span>}
+    </span>
+    {!meta && <span class="arrow" aria-hidden="true">→</span>}
+  </span>
+  {
+    meta && (
+      <span class="meta">
+        <span>{meta}</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </span>
+    )
+  }
+</a>
+
+<style>
+  .person {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-card);
+    padding: 20px;
+    color: var(--ink);
+    text-decoration: none;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .has-meta {
+    padding: 24px;
+    box-shadow: var(--shadow-rest);
+  }
+  .person:hover {
+    color: var(--ink);
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-2px);
+  }
+  .person:hover .name {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .names {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .name {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .has-meta .name {
+    font-size: 19px;
+  }
+  .role {
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+  .arrow {
+    flex: 0 0 auto;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .meta {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid var(--rule);
+    padding-top: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .meta .arrow {
+    color: var(--ink);
+  }
+</style>

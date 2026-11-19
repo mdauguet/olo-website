@@ -1,0 +1,100 @@
+---
+/** Layout for long-form text pages (code of conduct, privacy): one reading column and an "On this page" list. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  label: string;
+  title: string;
+  lede: string;
+  updated?: string;
+  sections: { id: string; heading: string; body: string }[];
+}
+const { label, title, lede, updated, sections } = Astro.props;
+---
+
+<BaseLayout title={title} description={lede}>
+  <div class="container layout">
+    <article class="main">
+      <header class="head">
+        <span class="label">{label}</span>
+        <h1 class="h1">{title}</h1>
+        <p class="lede">{lede}</p>
+        <span class="updated">{updated ? `Last updated ${updated}` : 'Draft: the text below is an outline to be written.'}</span>
+      </header>
+      {
+        sections.map((s) => (
+          <section id={s.id}>
+            <h2 class="h2">{s.heading}</h2>
+            <p class:list={['reading', { placeholder: s.body.startsWith('[') }]}>{s.body}</p>
+          </section>
+        ))
+      }
+    </article>
+    <nav class="toc" aria-labelledby="toc-heading">
+      <h2 id="toc-heading">On this page</h2>
+      {sections.map((s) => <a href={`#${s.id}`}>{s.heading}</a>)}
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px 64px;
+    align-items: flex-start;
+    padding-top: 40px;
+    padding-bottom: 72px;
+  }
+  .main {
+    flex: 999 1 560px;
+    min-width: 0;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .updated {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-margin-top: 24px;
+  }
+  .toc {
+    flex: 1 1 260px;
+    min-width: 0;
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-card);
+    padding: 24px 24px 14px;
+  }
+  .toc h2 {
+    margin-bottom: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .toc a {
+    padding: 9px 0;
+    border-top: 1px solid var(--rule);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .toc a:hover {
+    text-decoration: underline;
+  }
+</style>

@@ -1,0 +1,65 @@
+---
+import type { OloEvent } from '../lib/events';
+import { toIcsEvent } from '../lib/feed';
+import { googleCalendarUrl } from '../lib/ics';
+import { href } from '../lib/paths';
+
+interface Props {
+  event: OloEvent;
+  block?: boolean;
+}
+const { event, block = false } = Astro.props;
+const google = googleCalendarUrl(toIcsEvent(event, Astro.site));
+---
+
+<details class:list={['addcal', { block }]} data-menu>
+  <summary class="btn btn-quiet">Add to calendar <span aria-hidden="true">+</span></summary>
+  <div class="menu">
+    <a href={google} target="_blank" rel="noopener">Google Calendar ↗</a>
+    <a href={href(`/events/${event.id}.ics`)} download>Apple, Outlook and others (.ics)</a>
+  </div>
+</details>
+
+<style>
+  .addcal {
+    position: relative;
+  }
+  summary {
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .block summary {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 16px;
+    padding-inline: 20px;
+  }
+  .menu {
+    position: absolute;
+    z-index: 5;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-tile);
+    box-shadow: var(--shadow-lift);
+    padding: 6px;
+  }
+  .menu a {
+    padding: 12px 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .menu a:hover {
+    background: var(--sky-pale);
+    color: var(--ink);
+  }
+</style>

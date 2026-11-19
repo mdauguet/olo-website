@@ -1,0 +1,379 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Figure from '../../components/Figure.astro';
+import ZonesPanel from '../../components/ZonesPanel.astro';
+import AddToCalendar from '../../components/AddToCalendar.astro';
+import SessionRow from '../../components/SessionRow.astro';
+import Portrait from '../../components/Portrait.astro';
+import { getEvents, type OloEvent } from '../../lib/events';
+import { whenText } from '../../lib/when';
+import { href } from '../../lib/paths';
+import { roleLine } from '../../lib/people';
+import { PLATFORMS } from '../../data/topics';
+
+export async function getStaticPaths() {
+  const events = await getEvents();
+  return events.map((event) => ({ params: { slug: event.id }, props: { event, all: events } }));
+}
+
+interface Props {
+  event: OloEvent;
+  all: OloEvent[];
+}
+const { event: e, all } = Astro.props;
+const d = e.data;
+const past = e.isPast;
+const w = whenText(e.start, e.end, d.timezone);
+const { Content } = await render(e.entry);
+const hasBody = Boolean(e.entry.body?.trim());
+const kind = [e.typeLabel, e.topicLabel].filter(Boolean).join(' · ');
+const zonesId = `zones-${e.id}`;
+const platform = d.platform ? PLATFORMS[d.platform] : undefined;
+const whereDetail = past
+  ? platform
+    ? `Held live on ${platform}.`
+    : 'Held as a live online session.'
+  : `${platform ? `On ${platform}. ` : ''}${d.registration_url ? 'The link to join is sent after you register.' : 'The link to join is shared before the session.'}`;
+const costDetail = past
+  ? d.recording_url
+    ? 'The recording is free to watch.'
+    : 'Free to attend.'
+  : d.registration_url
+    ? 'Registration required.'
+    : 'No registration needed.';
+const materials = [
+  d.recording_url && { label: 'Watch the recording', url: d.recording_url },
+  d.slides_url && { label: 'Download the slides', url: d.slides_url },
+  d.code_url && { label: 'See the code', url: d.code_url },
+  ...d.links.map((l) => ({ label: l.label, url: l.url })),
+].filter(Boolean) as { label: string; url: string }[];
+const talkOnly = d.type === 'seminar' || d.type === 'talk';
+const tutorHeading = talkOnly ? (e.speakers.length > 1 ? 'Speakers' : 'Speaker') : e.speakers.length > 1 ? 'Your tutors' : 'Your tutor';
+const firstParagraph = (body?: string) => body?.trim().split(/\n\s*\n/)[0]?.replace(/[*_`#>]/g, '').trim();
+const others = all.filter((o) => !o.isPast && o.id !== e.id).slice(0, 2);
+---
+
+<BaseLayout title={d.title} description={d.summary} current={past ? 'archive' : 'events'}>
+  <div class="container">
+    <a class="back-link" href={href(past ? '/archive/' : '/events/')}
+      ><span aria-hidden="true">←</span> {past ? 'Past sessions' : 'All sessions'}</a
+    >
+
+    <section class="title-block">
+      <div class="text">
+        <span class="label">{kind}</span>
+        <h1 class="h1">{d.title}</h1>
+        {
+          e.speakers.length > 0 && (
+            <span class="byline">
+              with{' '}
+              {e.speakers
+                .map((p) => (p.data.affiliation ? `${p.data.name}, ${p.data.affiliation}` : p.data.name))
+                .join(' and ')}
+            </span>
+          )
+        }
+        {d.status !== 'scheduled' && <p class="status">This session has been {d.status}.</p>}
+      </div>
+      <Figure topic={e.mainTopic} />
+    </section>
+
+    <section class="glance card" aria-label="At a glance" data-when data-start={e.start.toISOString()} data-end={e.end.toISOString()}>
+      <div class="facts">
+        <div class="fact">
+          <span class="fact-label">When</span>
+          <span class="fact-value date" data-t="dateshort">{w.dateshort}</span>
+          <span class="fact-detail">
+            {
+              past ? (
+                <>
+                  Took place, <span data-t="range">{w.range}</span> <span data-t="zonephrase">{w.zonephrase}</span>
+                </>
+              ) : (
+                <>
+                  <span data-t="range">{w.range}</span>, <span data-t="zonephrase">{w.zonephrase}</span> ·{' '}
+                  <span data-t="countdown">{w.countdown}</span>
+                </>
+              )
+            }
+          </span>
+          {
+            !past && (
+              <button type="button" class="toggle-link teal" data-zones-toggle aria-controls={zonesId} aria-expanded="true" hidden>
+                Hide other time zones
+              </button>
+            )
+          }
+        </div>
+        <div class="fact">
+          <span class="fact-label">Where</span>
+          <span class="fact-value">Online</span>
+          <span class="fact-detail">{whereDetail}</span>
+        </div>
+        <div class="fact narrow">
+          <span class="fact-label">Cost</span>
+          <span class="fact-value">Free</span>
+          <span class="fact-detail">{costDetail}</span>
+        </div>
+        <div class="fact actions">
+          {
+            !past && d.registration_url && d.status === 'scheduled' && (
+              <a class="btn btn-primary block" href={d.registration_url} rel="noopener">
+                Register, free <span aria-hidden="true">→</span>
+              </a>
+            )
+          }
+          {!past && <AddToCalendar event={e} block />}
+          {
+            past && d.recording_url && (
+              <a class="btn btn-primary block" href={d.recording_url} rel="noopener">
+                Watch the recording <span aria-hidden="true">→</span>
+              </a>
+            )
+          }
+          {past && !d.recording_url && <p class="muted">No recording has been shared yet.</p>}
+        </div>
+      </div>
+      {!past && <ZonesPanel id={zonesId} start={e.start} />}
+    </section>
+
+    <div class="two-col body">
+      <div class="main-col">
+        <section class="stack">
+          <h2 class="h2">About this session</h2>
+          <p class="lede-serif">{d.summary}</p>
+        </section>
+        {
+          hasBody && (
+            <div class="reading">
+              <Content />
+            </div>
+          )
+        }
+        <section class="stack">
+          <h2 class="h2">Materials</h2>
+          {
+            materials.length > 0 ? (
+              <div class="materials">
+                {materials.map((m) => (
+                  <a class="link-strong big" href={m.url} rel="noopener">
+                    {m.label} →
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p class="reading muted">
+                {past
+                  ? 'Nothing has been shared for this session yet.'
+                  : 'Recordings, slides and code are shared here after the session, when available.'}
+              </p>
+            )
+          }
+        </section>
+      </div>
+
+      {
+        e.speakers.length > 0 && (
+          <aside class="side-col" aria-labelledby="tutor-heading">
+            <div class="side-card tutor">
+              <h2 id="tutor-heading" class="tutor-heading">
+                {tutorHeading}
+              </h2>
+              {e.speakers.map((p) => (
+                <div class="tutor-item">
+                  <div class="tutor-head">
+                    <Portrait person={p} />
+                    <span class="tutor-names">
+                      <span class="tutor-name">{p.data.name}</span>
+                      {roleLine(p) && <span class="tutor-role">{roleLine(p)}</span>}
+                    </span>
+                  </div>
+                  {firstParagraph(p.body) && <p class="tutor-bio">{firstParagraph(p.body)}</p>}
+                  <a class="link-strong" href={href(`/people/${p.id}/`)}>
+                    Full profile →
+                  </a>
+                </div>
+              ))}
+            </div>
+          </aside>
+        )
+      }
+    </div>
+
+    {
+      others.length > 0 && (
+        <section class="also" aria-labelledby="also-heading">
+          <div class="also-head">
+            <h2 id="also-heading">Also coming up</h2>
+            <a href={href('/events/')}>All upcoming sessions →</a>
+          </div>
+          {others.map((o) => (
+            <SessionRow event={o} />
+          ))}
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .status {
+    align-self: flex-start;
+    background: var(--plum-tint);
+    color: var(--plum-dark);
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: var(--r-tile);
+  }
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px 40px;
+    padding: clamp(22px, 3vw, 32px);
+  }
+  .fact {
+    flex: 1 1 200px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .fact.narrow {
+    flex-basis: 160px;
+  }
+  .fact-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .fact-value {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .fact-value.date {
+    color: var(--plum);
+  }
+  .fact-detail {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .toggle-link {
+    align-self: flex-start;
+  }
+  .toggle-link.teal {
+    color: var(--teal-ink);
+    font-size: 15px;
+  }
+  .actions {
+    flex-basis: 240px;
+    gap: 10px;
+    justify-content: center;
+  }
+  .btn.block {
+    display: flex;
+    justify-content: space-between;
+    min-height: 52px;
+    padding-inline: 20px;
+    font-size: 16px;
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .glance :global(.zones) {
+    border-radius: 0 0 19px 19px;
+  }
+  .body {
+    padding: 64px 0 72px;
+  }
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .lede-serif {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.15rem, 1.8vw, 1.35rem);
+    line-height: 1.6;
+    color: #2a3134;
+  }
+  .materials {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .big {
+    font-size: 17px;
+  }
+  .tutor {
+    gap: 16px;
+    padding-bottom: 20px;
+  }
+  .tutor-heading {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 700;
+  }
+  .tutor-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .tutor-item + .tutor-item {
+    border-top: 1px solid var(--rule);
+    padding-top: 16px;
+  }
+  .tutor-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .tutor-names {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .tutor-name {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .tutor-role {
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .tutor-bio {
+    font-family: var(--serif);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--body);
+  }
+  .also {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 56px;
+  }
+  .also-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px 24px;
+    border-top: 1px solid var(--rule);
+    padding-top: 32px;
+  }
+  .also-head h2 {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .also-head a {
+    font-size: 15px;
+    font-weight: 500;
+    padding: 8px 0;
+  }
+</style>

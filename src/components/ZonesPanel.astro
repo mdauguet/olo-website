@@ -1,0 +1,59 @@
+---
+import { worldTimes } from '../lib/when';
+
+interface Props {
+  id: string;
+  start: Date;
+}
+const { id, start } = Astro.props;
+const zones = worldTimes(start);
+---
+
+<div class="zones" id={id}>
+  <p class="sr-only">The same start time in other cities</p>
+  <ul>
+    {
+      zones.map((z) => (
+        <li>
+          <span class="city">{z.city}</span>
+          <span class="time">{z.time}</span>
+          <span class="note">{z.note}</span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .zones {
+    border-top: 1px solid var(--plum-rule);
+    background: var(--plum-pale);
+    padding: 4px clamp(10px, 2vw, 20px);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  li {
+    flex: 1 1 140px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .city {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .time {
+    font-size: 20px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .note {
+    font-size: 12px;
+    color: var(--muted);
+  }
+</style>

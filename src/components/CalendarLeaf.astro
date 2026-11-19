@@ -1,0 +1,124 @@
+---
+import type { WhenText } from '../lib/when';
+
+interface Props {
+  w: WhenText;
+  size?: 'lg' | 'sm';
+  past?: boolean;
+}
+const { w, size = 'sm', past = false } = Astro.props;
+---
+
+<span class:list={['leaf', size, { past }]} aria-hidden="true">
+  {size === 'lg' && <span class="stack back" />}
+  <span class="stack" />
+  <span class="sheet">
+    <span class="band" data-t="mon">{w.mon}</span>
+    <span class="num" data-t="day">{w.day}</span>
+    {size === 'lg' && <span class="wday" data-t="weekday">{w.weekday}</span>}
+  </span>
+</span>
+
+<style>
+  .leaf {
+    position: relative;
+    flex: 0 0 auto;
+    display: block;
+  }
+  .sheet {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    background: var(--white);
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--r-tile);
+    overflow: hidden;
+  }
+  .band {
+    background: var(--plum);
+    color: var(--white);
+    font-weight: 800;
+  }
+  .num {
+    font-family: var(--serif);
+    font-weight: 900;
+    line-height: 1;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .stack {
+    position: absolute;
+    bottom: 0;
+  }
+
+  .sm {
+    width: 60px;
+    padding-bottom: 4px;
+  }
+  .sm .stack {
+    left: 6px;
+    right: 6px;
+    height: 14px;
+    background: #dce6ea;
+    border-radius: 0 0 9px 9px;
+  }
+  .sm .band {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    padding: 4px 0 3px 0.16em;
+  }
+  .sm .num {
+    font-size: 24px;
+    padding: 7px 0 8px;
+  }
+
+  .lg {
+    width: 104px;
+    padding-bottom: 8px;
+  }
+  .lg .sheet {
+    border-color: var(--plum-line);
+    box-shadow: 0 1px 2px rgba(20, 40, 48, 0.06);
+  }
+  .lg .stack {
+    left: 5px;
+    right: 5px;
+    bottom: 4px;
+    height: 24px;
+    background: #f0dce4;
+    border-radius: 0 0 11px 11px;
+  }
+  .lg .stack.back {
+    left: 10px;
+    right: 10px;
+    bottom: 0;
+    background: #e6cbd6;
+    border-radius: 0 0 10px 10px;
+  }
+  .lg .band {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    padding: 8px 0 7px 0.18em;
+  }
+  .lg .num {
+    font-size: 46px;
+    letter-spacing: -0.02em;
+    padding: 12px 0 4px;
+  }
+  .lg .wday {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    padding: 0 0 12px;
+  }
+
+  .past .band {
+    background: var(--muted);
+  }
+  .past .num {
+    color: var(--muted-2);
+  }
+  .past .stack {
+    background: #e1e3df;
+  }
+</style>

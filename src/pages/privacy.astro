@@ -1,0 +1,31 @@
+---
+import TextPage from '../components/TextPage.astro';
+
+const sections = [
+  {
+    id: 'website',
+    heading: 'This website',
+    body: '[What the site collects, if anything. Fonts are served from this site, not from Google.]',
+  },
+  {
+    id: 'registration',
+    heading: 'Registering for a session',
+    body: '[Registration uses Google Forms: what the form asks for, who can see it and how long it is kept.]',
+  },
+  {
+    id: 'sessions',
+    heading: 'Live sessions and recordings',
+    body: '[Google Meet and Discord, and what a recorded session means for participants.]',
+  },
+  { id: 'email', heading: 'Emails and the newsletter', body: '[What we send, and how to unsubscribe.]' },
+  { id: 'hosting', heading: 'Hosting', body: '[Where the site is hosted, and what the host’s logs contain.]' },
+  { id: 'rights', heading: 'Your rights', body: '[Access, correction and deletion under the GDPR, and who to contact.]' },
+];
+---
+
+<TextPage
+  label="Legal"
+  title="Privacy"
+  lede="What we collect when you use this site or register for a session, and why."
+  sections={sections}
+/>

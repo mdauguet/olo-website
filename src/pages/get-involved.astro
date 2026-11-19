@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import site from '../data/site.json';
+import { linkOr } from '../lib/paths';
+
+const ways = [
+  {
+    title: 'Teach a session',
+    text: 'Show other labs an open-source tool or method you use, as a hands-on workshop, a seminar or a short course.',
+    action: 'Propose a session',
+    url: linkOr(site.proposal_url),
+    primary: true,
+    glyph: '<rect x="4" y="10" width="22" height="30" fill="#F4E4EA"/><path d="M2 34 H12 V18 H30 V34 H46" fill="none" stroke="#9A4061" stroke-width="2"/>',
+  },
+  {
+    title: 'Shape what we teach',
+    text: 'The community survey takes 5 to 10 minutes. Your answers directly shape the content and format of upcoming workshops.',
+    action: 'Take the survey ↗',
+    url: linkOr(site.survey_url),
+    glyph: '<rect x="6" y="26" width="8" height="16" fill="#A0CFE6"/><rect x="20" y="14" width="8" height="28" fill="#00A5A3"/><rect x="34" y="20" width="8" height="22" fill="#A0CFE6"/><line x1="2" y1="44" x2="46" y2="44" stroke="#1C1E1F" stroke-width="1.5"/>',
+  },
+  {
+    title: 'Join us on Discord',
+    text: 'Some sessions take place on Discord. Join the server to take part and keep in touch with other participants.',
+    action: 'Open Discord ↗',
+    url: linkOr(site.discord_url),
+    glyph: '<circle cx="18" cy="24" r="13" fill="#A0CFE6" style="mix-blend-mode:multiply"/><circle cx="30" cy="24" r="13" fill="#00A5A3" style="mix-blend-mode:multiply"/>',
+  },
+  {
+    title: 'Get the newsletter',
+    text: 'Hear about new sessions by email.',
+    action: 'Subscribe ↗',
+    url: linkOr(site.newsletter_url),
+    glyph: '<rect x="4" y="12" width="40" height="26" fill="#E4F2F8"/><path d="M4 12 L24 28 L44 12" fill="none" stroke="#1C1E1F" stroke-width="1.5"/>',
+  },
+];
+const contact = site.contact_email;
+---
+
+<BaseLayout title="Get involved" current="get-involved">
+  <div class="container">
+    <section class="page-head">
+      <h1 class="h1">Get involved</h1>
+      <p class="lede">Open Lab Online is community-driven. Here is how you can take part.</p>
+    </section>
+
+    <div class="ways">
+      {
+        ways.map((w) => (
+          <article class="way">
+            <svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true" set:html={w.glyph} />
+            <h2 class="h2">{w.title}</h2>
+            <p>{w.text}</p>
+            <a class:list={['btn', w.primary ? 'btn-primary' : 'btn-outline']} href={w.url} rel="noopener">
+              {w.action}
+              {w.primary && <span aria-hidden="true">→</span>}
+            </a>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="extra">
+      <section>
+        <h2 class="h2">Spread the word</h2>
+        <p class="reading">Share Open Lab Online, or the survey, with your lab and your networks.</p>
+      </section>
+      <section>
+        <h2 class="h2">Questions</h2>
+        <p class="reading">
+          {
+            contact ? (
+              <>
+                Write to us at <a href={`mailto:${contact}`}>{contact}</a>.
+              </>
+            ) : (
+              <span class="placeholder">[Contact email to be added.]</span>
+            )
+          }
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .ways {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+    gap: 16px;
+    padding-bottom: 56px;
+  }
+  .way {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-card);
+    padding: clamp(24px, 3vw, 32px);
+  }
+  .way p {
+    font-family: var(--serif);
+    font-size: 16.5px;
+    line-height: 1.7;
+    color: var(--body);
+  }
+  .way .btn {
+    align-self: flex-start;
+    margin-top: auto;
+  }
+  .extra {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px 64px;
+    border-top: 1px solid var(--rule);
+    padding: 36px 0 64px;
+  }
+  .extra section {
+    flex: 1 1 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+</style>

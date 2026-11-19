@@ -1,0 +1,23 @@
+---
+import TextPage from '../components/TextPage.astro';
+
+const sections = [
+  { id: 'in-short', heading: 'In short', body: '[Two or three sentences that sum up the code.]' },
+  { id: 'expected', heading: 'Expected behaviour', body: '[How participants, tutors and organisers treat each other.]' },
+  { id: 'unacceptable', heading: 'Unacceptable behaviour', body: '[Examples of harassment and other behaviour that is not allowed.]' },
+  { id: 'live', heading: 'During live sessions', body: '[Cameras, microphones, chat, screen sharing and recording.]' },
+  {
+    id: 'reporting',
+    heading: 'Reporting a problem',
+    body: '[Who to contact and how, and what happens to a report. Include a way to report that does not go through the session’s host.]',
+  },
+  { id: 'consequences', heading: 'Consequences', body: '[What organisers may do, from a warning to removal from future sessions.]' },
+];
+---
+
+<TextPage
+  label="Community"
+  title="Code of conduct"
+  lede="Open Lab Online is open to everyone. This code applies to every session, the Discord server and any other space we run."
+  sections={sections}
+/>

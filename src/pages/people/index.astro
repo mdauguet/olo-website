@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PersonCard from '../../components/PersonCard.astro';
+import { getEvents } from '../../lib/events';
+import { getPeople, sessionsFor, surname, topicsOf } from '../../lib/people';
+import { href } from '../../lib/paths';
+
+const events = await getEvents();
+const people = (await getPeople())
+  .map((p) => ({ person: p, sessions: sessionsFor(p.id, events) }))
+  .filter((x) => x.sessions.length > 0)
+  .sort((a, b) => surname(a.person.data.name).localeCompare(surname(b.person.data.name)));
+const meta = (sessions: typeof events) => {
+  const topic = topicsOf(sessions)[0]?.label;
+  const count = sessions.length === 1 ? '1 session' : `${sessions.length} sessions`;
+  return [topic, count].filter(Boolean).join(' · ');
+};
+---
+
+<BaseLayout title="Tutors and speakers">
+  <div class="container">
+    <section class="page-head">
+      <h1 class="h1">Tutors and speakers</h1>
+      <p class="lede">The researchers who teach and present at Open Lab Online, sorted by surname.</p>
+    </section>
+    <div class="grid">
+      {people.map(({ person, sessions }) => <PersonCard person={person} meta={meta(sessions)} />)}
+    </div>
+    <section class="cta-line">
+      <p>Have an open-source tool or method to share with other labs?</p>
+      <a class="btn btn-outline" href={href('/get-involved/')}>Propose a session <span aria-hidden="true">→</span></a>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+    gap: 16px;
+    padding-bottom: 56px;
+  }
+</style>

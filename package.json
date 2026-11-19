@@ -1,0 +1,27 @@
+{
+  "name": "open-lab-online",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Website for Open Lab Online — free online workshops on open-source tools for neuroscience.",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "node --test \"tests/**/*.test.ts\""
+  },
+  "dependencies": {
+    "@fontsource-variable/merriweather": "^5.3.0",
+    "@fontsource-variable/merriweather-sans": "^5.3.0",
+    "astro": "^7.4.12"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/node": "^24.19.2",
+    "typescript": "^6.0.3"
+  }
+}

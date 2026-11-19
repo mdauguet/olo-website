@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { href } from '../lib/paths';
+---
+
+<BaseLayout title="Page not found">
+  <div class="container">
+    <section class="nf">
+      <figure class="fig">
+        <svg viewBox="0 0 96 96" role="img" aria-label="Illustration: a flat signal line where a pulse should be">
+          <rect x="30" y="12" width="20" height="76" fill="#A0CFE6" style="mix-blend-mode:multiply"></rect>
+          <circle cx="72" cy="28" r="12" fill="#9A4061"></circle>
+          <path d="M4 60 H92" fill="none" stroke="#1C1E1F" stroke-width="1.6"></path>
+          <line x1="30" y1="6" x2="30" y2="92" stroke="#1C1E1F" stroke-width="0.8" stroke-dasharray="1.5 2"></line>
+        </svg>
+        <figcaption>Fig. — No signal at this address.</figcaption>
+      </figure>
+      <div class="text">
+        <span class="label">Error 404</span>
+        <h1 class="h1">Page not found</h1>
+        <p>The page may have moved, or the link may be mistyped.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href={href('/events/')}>Upcoming sessions <span aria-hidden="true">→</span></a>
+          <a class="btn btn-quiet" href={href('/archive/')}>Past sessions</a>
+          <a class="link-strong" href={href('/')}>Home</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .nf {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px 72px;
+    align-items: center;
+    padding: 72px 0 104px;
+  }
+  .fig {
+    flex: 1 1 240px;
+    max-width: 300px;
+  }
+  .text {
+    flex: 999 1 480px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  p {
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--body);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .actions .link-strong {
+    align-self: center;
+    padding: 12px 4px;
+  }
+</style>

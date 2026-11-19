@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SessionRow from '../../components/SessionRow.astro';
+import { getUpcomingAndPast } from '../../lib/events';
+import { whenText } from '../../lib/when';
+import { href, linkOr } from '../../lib/paths';
+import site from '../../data/site.json';
+
+const { upcoming } = await getUpcomingAndPast();
+const months = new Map<string, typeof upcoming>();
+for (const e of upcoming) {
+  const w = whenText(e.start, e.end, e.data.timezone);
+  const key = `${w.month} ${w.year}`;
+  months.set(key, [...(months.get(key) ?? []), e]);
+}
+---
+
+<BaseLayout title="Upcoming sessions" current="events">
+  <div class="container">
+    <section class="page-head">
+      <h1 class="h1">Upcoming sessions</h1>
+      <p class="lede">Free, live and online. Register for a session and you will get the link to join.</p>
+    </section>
+
+    {
+      [...months].map(([month, events], i) => (
+        <section class="month" aria-labelledby={`month-${i}`}>
+          <div class="section-head">
+            <h2 id={`month-${i}`} class="h2">
+              {month}
+            </h2>
+            <span class="note">{events.length === 1 ? '1 session' : `${events.length} sessions`}</span>
+          </div>
+          {events.map((e) => (
+            <SessionRow event={e} showSummary />
+          ))}
+        </section>
+      ))
+    }
+
+    {
+      upcoming.length === 0 && (
+        <p class="none">No sessions are scheduled right now. New ones are announced here first.</p>
+      )
+    }
+
+    <section class="loop">
+      <div>
+        <h2>More sessions are on the way</h2>
+        <p>Hear about new sessions as soon as they are announced.</p>
+      </div>
+      <div class="loop-actions">
+        <a class="btn btn-quiet" href={href('/calendar.ics')}>Subscribe to the calendar</a>
+        <a class="btn btn-quiet" href={linkOr(site.discord_url)}>Discord ↗</a>
+        <a class="btn btn-quiet" href={linkOr(site.newsletter_url)}>Newsletter ↗</a>
+      </div>
+    </section>
+
+    <section class="cta-line">
+      <p>Have an open-source tool or method to share with other labs?</p>
+      <a class="btn btn-outline" href={href('/get-involved/')}>Propose a session <span aria-hidden="true">→</span></a>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .month {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 48px;
+  }
+  .note {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .none {
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--body);
+    padding-bottom: 40px;
+  }
+  .loop {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px 32px;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--sky-pale);
+    border-radius: var(--r-card);
+    padding: 28px clamp(20px, 3vw, 32px);
+    margin-bottom: 48px;
+  }
+  .loop h2 {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .loop p {
+    margin-top: 6px;
+    font-size: 15px;
+    color: #3c4e56;
+  }
+  .loop-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+</style>

@@ -1,0 +1,23 @@
+---
+/**
+ * The OLO mark: a circle into a square (after the Nencki Open Lab mark),
+ * with three radio waves heading east.
+ */
+interface Props {
+  width?: number;
+  waves?: string;
+}
+const { width = 44, waves = '#007A78' } = Astro.props;
+const height = Math.round((width * 36) / 60);
+---
+
+<svg width={width} height={height} viewBox="0 2 60 36" aria-hidden="true" focusable="false">
+  <rect x="16" y="4" width="32" height="32" fill="#A0CFE6"></rect>
+  <circle cx="16" cy="20" r="16" fill="#00A5A3"></circle>
+  <path d="M16 4 A16 16 0 0 1 16 36 Z" fill="#008693"></path>
+  <path
+    d="M39.83 13.12 A12 12 0 0 1 39.83 26.88 M46.38 8.53 A20 20 0 0 1 46.38 31.47 M52.94 3.94 A28 28 0 0 1 52.94 36.06"
+    fill="none"
+    stroke={waves}
+    stroke-width="3.2"></path>
+</svg>
